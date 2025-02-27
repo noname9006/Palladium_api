@@ -1,6 +1,9 @@
-import 'dotenv/config';
-import { Client, GatewayIntentBits } from 'discord.js';
-import fetch from 'node-fetch';
+// Convert everything to CommonJS but handle node-fetch differently
+require('dotenv/config');
+const { Client, GatewayIntentBits } = require('discord.js');
+
+// Use dynamic import for node-fetch (works with ESM-only modules in CommonJS)
+const fetchModule = import('node-fetch').then(module => module.default);
 
 // Initialize Discord client
 const client = new Client({
@@ -168,6 +171,9 @@ async function fetchDataWithTimeout(timeout) {
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
+        // Get the fetch function from the imported module
+        const fetch = await fetchModule;
+        
         const response = await fetch(process.env.API_URL, {
             signal: controller.signal
         });
